@@ -1,0 +1,24 @@
+body {
+  text-align: center;
+}
+
+.container {
+  display: grid;
+  width: 400px;
+  height: 400px;
+  min-width: min-content;
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+
+  padding: 1rem;
+  margin: auto;
+}
+
+.cell {
+  background: rgb(255, 255, 197);
+  border: solid black 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+}

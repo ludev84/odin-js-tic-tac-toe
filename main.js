@@ -30,18 +30,26 @@ function Gameboard() {
     console.log(consoleBoard);
   };
 
-  return { getBoard, placeToken, printGameboard };
+  const resetBoard = () => {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < columns; j++) {
+        board[i][j] = "";
+      }
+    }
+  };
+
+  return { getBoard, placeToken, printGameboard, resetBoard };
 }
 
-function GameController(playerOneName = "Joe", playerTwoName = "Karen") {
+function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
   const players = [
     {
       name: playerOneName,
-      marker: "X",
+      marker: "✖️",
     },
     {
       name: playerTwoName,
-      marker: "O",
+      marker: "⭕",
     },
   ];
 
@@ -55,24 +63,59 @@ function GameController(playerOneName = "Joe", playerTwoName = "Karen") {
 
   const getActivePlayer = () => activePlayer;
 
+  // Print game in console
   const printNewRound = () => {
-    console.log(`${getActivePlayer().name}'s turn. Marker: ${getActivePlayer().marker}`)
-    board.printGameboard()
-  }
+    console.log(
+      `${getActivePlayer().name}'s turn`,
+    );
+    board.printGameboard();
+  };
 
   const playRound = (position) => {
     board.placeToken(position, getActivePlayer().marker);
     switchPlayerTurn();
-    printNewRound();
+    // printNewRound();
   };
 
-  // Initial play game message
-  printNewRound();
+  const resetGame = () => {
+    board.resetBoard();
+    activePlayer = players[0];
+  };
 
-  return { playRound, getActivePlayer };
+  // Initial play game message (console)
+  // printNewRound();
+
+  return { playRound, getActivePlayer, resetGame };
 }
 
 const game = GameController();
 
-// game.playRound([1,3])
-// game.playRound([1,2])
+// DOM manipulation and events
+const container = document.querySelector(".container");
+const cells = document.querySelectorAll(".cell");
+const divPlayer = document.querySelector(".player");
+const btnReset = document.querySelector(".reset");
+
+function displayCurrentPlayer() {
+  divPlayer.innerHTML = `Current player: ${game.getActivePlayer().name} ${game.getActivePlayer().marker}`;
+}
+
+displayCurrentPlayer()
+
+container.addEventListener("click", (e) => {
+  if (e.target.classList.contains("cell") && e.target.innerHTML.trim() == "") {
+    const row = e.target.dataset.row;
+    const col = e.target.dataset.col;
+    e.target.innerHTML = game.getActivePlayer().marker;
+    game.playRound([row, col]);
+    displayCurrentPlayer();
+  }
+});
+
+btnReset.addEventListener("click", (e) => {
+  for (let cell of cells) {
+    cell.innerHTML = "";
+  }
+  game.resetGame();
+  displayCurrentPlayer();
+});
