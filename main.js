@@ -45,11 +45,11 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   const players = [
     {
       name: playerOneName,
-      marker: "✖️",
+      marker: "⭕",
     },
     {
       name: playerTwoName,
-      marker: "⭕",
+      marker: "✖️",
     },
   ];
 
