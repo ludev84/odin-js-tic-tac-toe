@@ -55,11 +55,19 @@ function GameController(playerOneName = "Joe", playerTwoName = "Karen") {
 
   const getActivePlayer = () => activePlayer;
 
+  const printNewRound = () => {
+    console.log(`${getActivePlayer().name}'s turn. Marker: ${getActivePlayer().marker}`)
+    board.printGameboard()
+  }
+
   const playRound = (position) => {
     board.placeToken(position, getActivePlayer().marker);
-    board.printGameboard();
     switchPlayerTurn();
+    printNewRound();
   };
+
+  // Initial play game message
+  printNewRound();
 
   return { playRound, getActivePlayer };
 }
