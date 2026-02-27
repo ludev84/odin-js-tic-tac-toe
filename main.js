@@ -13,8 +13,8 @@ function Gameboard() {
   const getBoard = () => board;
 
   const placeToken = (position, marker) => {
-    const row = position[0] - 1;
-    const col = position[1] - 1;
+    const row = position[0];
+    const col = position[1];
     const currentCell = board[row][col];
     if (isGameFinished()) return;
     if (currentCell !== "") return;
@@ -175,29 +175,44 @@ function ScreenController() {
   
   const updateScreen = () => {
     const board = game.getBoard();
+    const activePlayer = game.getActivePlayer().name
+    const activeMarker = game.getActivePlayer().marker
 
     // Clear board
     boardDiv.innerHTML = "";
 
+    // Player name
+    playerTurnDiv.innerHTML = `Current player: ${activePlayer}`
+
     // Build the board
-    board.forEach((row) =>
-      row.forEach((cell, index) => {
+    board.forEach((row, indexRow) =>
+      row.forEach((cell, indexCol) => {
         const cellDiv = document.createElement("div");
         cellDiv.classList.add("cell");
-        cellDiv.dataset.row = row;
-        cellDiv.dataset.col = index;
+        cellDiv.dataset.row = indexRow;
+        cellDiv.dataset.col = indexCol;
         cellDiv.innerHTML = cell;
         boardDiv.appendChild(cellDiv);
       }),
     );
 
-    // Player name
-    playerTurnDiv.innerHTML = `Current player: ${game.getActivePlayer().name}`
   };
 
+  // Event listeners as I already had them outside a function
+  boardDiv.addEventListener("click", (e) => {
+    // Notice here we have a DOMStringMap {row: ',,', col: '2'} in e.target.dataset
+    const {row, col} = e.target.dataset;
+    if (!row || !col) return;
+    game.playRound([row, col])
+    e.target.innerHTML = game.getActivePlayer().marker
+    // const col = e.target.dataset.col;
+
+  })
+
   // Initial update screen
-  // game.playRound([1, 2]);
-  // game.playRound([1, 3]);
+  game.playRound([1, 2]);
+  game.playRound([2, 1]);
+  game.playRound([1, 2]);
   updateScreen()
 
   return { updateScreen }
