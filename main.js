@@ -91,6 +91,8 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 const game = GameController();
 
 // DOM manipulation and events
+// In the connect four game, they use another function, ScreenController
+// I just stashed a really messy code for checking wining situation
 const container = document.querySelector(".container");
 const cells = document.querySelectorAll(".cell");
 const divPlayer = document.querySelector(".player");
@@ -106,6 +108,8 @@ container.addEventListener("click", (e) => {
   if (e.target.classList.contains("cell") && e.target.innerHTML.trim() == "") {
     const row = e.target.dataset.row;
     const col = e.target.dataset.col;
+    // So, we have errors, here I am already updating the DOM object to the marker of the player
+    // without really validating IF the move is valid
     e.target.innerHTML = game.getActivePlayer().marker;
     game.playRound([row, col]);
     displayCurrentPlayer();
