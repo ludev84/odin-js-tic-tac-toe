@@ -39,7 +39,7 @@ function Gameboard() {
     const row = position[0] - 1;
     const col = position[1] - 1;
     return board[row][col];
-  }
+  };
 
   const isGameFinished = () => {
     const lines = [
@@ -86,17 +86,17 @@ function Gameboard() {
     ];
 
     for (line of lines) {
-      let cell1 = getCellValue(line[0])
-      let cell2 = getCellValue(line[1])
-      let cell3 = getCellValue(line[2])
-      if (cell1 === cell2 && cell2 === cell3 && cell1 !== "") return true;   // Win
+      let cell1 = getCellValue(line[0]);
+      let cell2 = getCellValue(line[1]);
+      let cell3 = getCellValue(line[2]);
+      if (cell1 === cell2 && cell2 === cell3 && cell1 !== "") return true; // Win
     }
 
     const availableCells = getAvailableCells();
-    if (availableCells.length == 0) return true;    // Tie
+    if (availableCells.length == 0) return true; // Tie
 
     return false;
-  }
+  };
 
   const printGameboard = () => {
     const consoleBoard = board
@@ -116,10 +116,15 @@ function Gameboard() {
     }
   };
 
-  return { getBoard, placeToken, printGameboard, resetBoard, isGameFinished };
+  return { getBoard, placeToken, printGameboard, resetBoard, isGameFinished, getCellValue };
 }
 
-function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
+function GameController(
+  playerOneName = "Player One",
+  playerTwoName = "Player Two",
+) {
+  const board = Gameboard();
+
   const players = [
     {
       name: playerOneName,
@@ -131,8 +136,6 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     },
   ];
 
-  const board = Gameboard();
-
   let activePlayer = players[0];
 
   const switchPlayerTurn = () => {
@@ -143,9 +146,7 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
   // Print game in console
   const printNewRound = () => {
-    console.log(
-      `${getActivePlayer().name}'s turn`,
-    );
+    console.log(`${getActivePlayer().name}'s turn`);
     board.printGameboard();
   };
 
@@ -163,9 +164,43 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   // Initial play game message (console)
   printNewRound();
 
-  return { playRound, getActivePlayer, resetGame };
+  // We return getBoard fn from our board object (GameBoard)
+  return { playRound, getActivePlayer, resetGame, getBoard: board.getBoard };
 }
 
-const game = GameController();
+function ScreenController() {
+  const game = GameController();
+  const playerTurnDiv = document.querySelector(".player")
+  const boardDiv = document.querySelector(".board")  
+  
+  const updateScreen = () => {
+    const board = game.getBoard();
 
-game.playRound([1,2])
+    // Clear board
+    boardDiv.innerHTML = "";
+
+    // Build the board
+    board.forEach((row) =>
+      row.forEach((cell, index) => {
+        const cellDiv = document.createElement("div");
+        cellDiv.classList.add("cell");
+        cellDiv.dataset.row = row;
+        cellDiv.dataset.col = index;
+        cellDiv.innerHTML = cell;
+        boardDiv.appendChild(cellDiv);
+      }),
+    );
+
+    // Player name
+    playerTurnDiv.innerHTML = `Current player: ${game.getActivePlayer().name}`
+  };
+
+  // Initial update screen
+  // game.playRound([1, 2]);
+  // game.playRound([1, 3]);
+  updateScreen()
+
+  return { updateScreen }
+}
+
+ScreenController()
