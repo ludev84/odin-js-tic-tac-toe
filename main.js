@@ -16,7 +16,8 @@ function Gameboard() {
     const row = position[0];
     const col = position[1];
     const currentCell = board[row][col];
-    if (isGameFinished()) return;
+    if (isGameWon()) return;
+    if (isGameTied()) return;
     if (currentCell !== "") return;
     board[row][col] = marker;
   };
@@ -41,7 +42,7 @@ function Gameboard() {
     return board[row][col];
   }
 
-  const isGameFinished = () => {
+  const isGameWon = () => {
     const lines = [
       [
         [0, 0],
@@ -86,15 +87,17 @@ function Gameboard() {
     ];
 
     for (line of lines) {
-      let cell1 = getCellValue(line[0])
-      let cell2 = getCellValue(line[1])
-      let cell3 = getCellValue(line[2])
-      if (cell1 === cell2 && cell2 === cell3 && cell1 !== "") return true;   // Win
+      let cell1 = getCellValue(line[0]);
+      let cell2 = getCellValue(line[1]);
+      let cell3 = getCellValue(line[2]);
+      if (cell1 === cell2 && cell2 === cell3 && cell1 !== "") return true; // Win
     }
+    return false;
+  };
 
+  const isGameTied = () => {
     const availableCells = getAvailableCells();
     if (availableCells.length == 0) return true;    // Tie
-
     return false;
   }
 
@@ -116,18 +119,18 @@ function Gameboard() {
     }
   };
 
-  return { getBoard, placeToken, printGameboard, resetBoard, isGameFinished, getCellValue };
+  return { getBoard, placeToken, printGameboard, resetBoard, getCellValue, isGameTied, isGameWon };
 }
 
 function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
   const players = [
     {
       name: playerOneName,
-      marker: "O",
+      marker: "⭕",
     },
     {
       name: playerTwoName,
-      marker: "X",
+      marker: "✖️",
     },
   ];
 
@@ -136,7 +139,9 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   let activePlayer = players[0];
 
   const switchPlayerTurn = () => {
-    activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    if (!board.isGameTied() && !board.isGameWon()) {
+      activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    }
   };
 
   const getActivePlayer = () => activePlayer;
@@ -150,14 +155,26 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   };
 
   const playRound = (position) => {
-    if (!board.isGameFinished() && board.getCellValue(position) === "") {
+    // This is messy, this can be optimized.
+    // THis checks if the game is now over, by win or tie, and the cell empty
+    // Returns true or false, to be used in ScreenController to update DOM. Fix.
+    // I did change some things, now let's use it in DOM
+    if (
+      !board.isGameTied() &&
+      !board.isGameWon() &&
+      board.getCellValue(position) === ""
+    ) {
       board.placeToken(position, getActivePlayer().marker);
       switchPlayerTurn();
-      // printNewRound();
-      return true;
-    } else if (board.isGameFinished()) {
-      return false;
+      // return true;
+    } else if (board.isGameWon()) {
+      // This gets executed AFTER winner's turn
+      console.log(`Game finished, the winner is: ${getActivePlayer().name}`);
+      // return false;
+    } else if (board.isGameTied()) {
+      console.log("That is a tie")
     }
+    printNewRound();
   };
 
   const resetGame = () => {
@@ -166,10 +183,23 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   };
 
   // Initial play game message (console)
-  // printNewRound();
+  printNewRound();
 
   return { playRound, getActivePlayer, resetGame, getBoard: board.getBoard };
 }
+
+// const play1 = prompt("Enter player 1: ")
+// const play2 = prompt("Enter player 2: ")
+
+// const game = GameController(play1, play2);
+
+// game.playRound([0,0])
+// game.playRound([2,0])
+// game.playRound([0,1])
+// game.playRound([2,1])
+// game.playRound([1,2])
+// game.playRound([2,2])
+// game.playRound([1,0])
 
 
 function ScreenController() {
@@ -181,7 +211,6 @@ function ScreenController() {
   const updateScreen = () => {
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer().name
-    // const activeMarker = game.getActivePlayer().marker
 
     // Clear board
     boardDiv.innerHTML = "";
@@ -208,6 +237,7 @@ function ScreenController() {
     // Notice here we have a DOMStringMap {row: '1', col: '2'} in e.target.dataset
     const {row, col} = e.target.dataset;
     if (!row || !col) return;
+    // I think this can be in a function, and keep it separated from the add event listener
     game.playRound([row, col])
     updateScreen()
   })
@@ -223,4 +253,4 @@ function ScreenController() {
   return { updateScreen }
 }
 
-ScreenController()
+// ScreenController()
