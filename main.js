@@ -116,18 +116,18 @@ function Gameboard() {
     }
   };
 
-  return { getBoard, placeToken, printGameboard, resetBoard, isGameFinished };
+  return { getBoard, placeToken, printGameboard, resetBoard, isGameFinished, getCellValue };
 }
 
 function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
   const players = [
     {
       name: playerOneName,
-      marker: "⭕",
+      marker: "O",
     },
     {
       name: playerTwoName,
-      marker: "✖️",
+      marker: "X",
     },
   ];
 
@@ -150,9 +150,11 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   };
 
   const playRound = (position) => {
-    board.placeToken(position, getActivePlayer().marker);
-    switchPlayerTurn();
-    printNewRound();
+    if (!board.isGameFinished() && board.getCellValue(position) === "") {
+      board.placeToken(position, getActivePlayer().marker);
+      switchPlayerTurn();
+      printNewRound();
+    }
   };
 
   const resetGame = () => {
