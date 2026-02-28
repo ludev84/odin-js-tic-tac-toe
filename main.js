@@ -157,8 +157,6 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   const playRound = (position) => {
     // This is messy, this can be optimized.
     // THis checks if the game is now over, by win or tie, and the cell empty
-    // Returns true or false, to be used in ScreenController to update DOM. Fix.
-    // I did change some things, now let's use it in DOM
     if (
       !board.isGameTied() &&
       !board.isGameWon() &&
@@ -166,15 +164,13 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     ) {
       board.placeToken(position, getActivePlayer().marker);
       switchPlayerTurn();
-      // return true;
+      // printNewRound();
     } else if (board.isGameWon()) {
       // This gets executed AFTER winner's turn
       console.log(`Game finished, the winner is: ${getActivePlayer().name}`);
-      // return false;
     } else if (board.isGameTied()) {
       console.log("That is a tie")
     }
-    printNewRound();
   };
 
   const resetGame = () => {
@@ -183,27 +179,15 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   };
 
   // Initial play game message (console)
-  printNewRound();
+  // printNewRound();
 
-  return { playRound, getActivePlayer, resetGame, getBoard: board.getBoard };
+  return { playRound, getActivePlayer, resetGame, getBoard: board.getBoard, isGameWon: board.isGameWon, isGameTied: board.isGameTied };
 }
 
-// const play1 = prompt("Enter player 1: ")
-// const play2 = prompt("Enter player 2: ")
-
-// const game = GameController(play1, play2);
-
-// game.playRound([0,0])
-// game.playRound([2,0])
-// game.playRound([0,1])
-// game.playRound([2,1])
-// game.playRound([1,2])
-// game.playRound([2,2])
-// game.playRound([1,0])
-
-
 function ScreenController() {
-  const game = GameController();
+  const playerOneName = prompt("Player One Name:", "Player One")
+  const playerTwoName = prompt("Player Two Name:", "Player Two")
+  const game = GameController(playerOneName, playerTwoName);
   const playerTurnDiv = document.querySelector(".player")
   const boardDiv = document.querySelector(".board")
   const resetBtn = document.querySelector(".reset")
@@ -215,8 +199,14 @@ function ScreenController() {
     // Clear board
     boardDiv.innerHTML = "";
 
-    // Player name
-    playerTurnDiv.innerHTML = `Current player: ${activePlayer}`
+    // Display current player, winner or tie
+    if (game.isGameWon()) {
+      playerTurnDiv.innerHTML = `The winner is: ${activePlayer}`
+    } else if (game.isGameTied()) {
+      playerTurnDiv.innerHTML = `It's a tie`
+    } else {
+      playerTurnDiv.innerHTML = `Current player: ${activePlayer}`
+    }
 
     // Build the board
     board.forEach((row, indexRow) =>
@@ -253,4 +243,4 @@ function ScreenController() {
   return { updateScreen }
 }
 
-// ScreenController()
+ScreenController()

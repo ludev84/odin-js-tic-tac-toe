@@ -1,5 +1,8 @@
 body {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
 }
 
 .board {
@@ -21,4 +24,18 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 4rem;
+}
+
+.reset {
+  background: rgb(73, 99, 168);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.reset:hover {
+  cursor: pointer;
+  background: rgb(47, 71, 142);
 }
