@@ -154,6 +154,8 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
       board.placeToken(position, getActivePlayer().marker);
       switchPlayerTurn();
       printNewRound();
+    } else if (board.isGameFinished()) {
+      console.log("Game over!")
     }
   };
 
@@ -171,3 +173,5 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 const game = GameController();
 
 game.playRound([1,2])
+game.playRound([1,2])
+game.playRound([1,3])
